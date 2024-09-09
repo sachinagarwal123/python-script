@@ -34,7 +34,7 @@ def add_text_to_pdf(input_pdf, output_pdf, text1, text2, font_path):
 
     # Add text to the new PDF
     # Positioning is now relative to page dimensions
-    can.drawString(page_width * 0.43, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
+    can.drawString(page_width * 0.39, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
     can.drawString(page_width * 0.1, page_height * 0.07, text2)  # Left side, about 1/5 up from bottom
     can.save()
 
