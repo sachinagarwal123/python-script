@@ -5,6 +5,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+import sys
 
 def create_blank_pdf(filename):
     c = canvas.Canvas(filename, pagesize=letter)
@@ -68,11 +69,19 @@ text2 = input("Enter the second text in Russian: ")
 x1, y1 = 100, 700  # coordinates for text1
 x2, y2 = 100, 680  # coordinates for text2
 
+
+if sys.platform.startswith('win'):
+    default_font = 'C:\\Windows\\Fonts\\arial.ttf'
+elif sys.platform.startswith('darwin'):  # macOS
+    default_font = '/Library/Fonts/Arial Unicode.ttf'
+else:  # Linux and others
+    default_font = '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf'
 # Ask user for font file path
-default_font = 'C:\\Windows\\Fonts\\arial.ttf'  # Default Windows font path
+
 font_path = input(f"Enter the path to a TrueType font file (press Enter to use default: {default_font}): ")
 if not font_path:
     font_path = default_font
+
 
 if not os.path.exists(font_path):
     print(f"Warning: Font file not found at {font_path}. Using default font.")
