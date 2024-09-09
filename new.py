@@ -7,11 +7,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import sys
 
-def create_blank_pdf(filename):
-    c = canvas.Canvas(filename, pagesize=letter)
-    c.save()
-
-def add_text_to_pdf(input_pdf, output_pdf, text1, text2, x1, y1, x2, y2, font_path):
+def add_text_to_pdf(input_pdf, output_pdf, text1, text2, font_path):
     try:
         # Register the font
         font_name = os.path.splitext(os.path.basename(font_path))[0]
@@ -20,32 +16,35 @@ def add_text_to_pdf(input_pdf, output_pdf, text1, text2, x1, y1, x2, y2, font_pa
         print(f"Error: Unable to load font from {font_path}. Using default font.")
         font_name = 'Helvetica'  # Use a default font that supports Russian characters
 
+    # Read your existing PDF
+    existing_pdf = PdfReader(open(input_pdf, "rb"))
+    output = PdfWriter()
+
+    # Get the first page
+    page = existing_pdf.pages[0]
+    
+    # Get page dimensions
+    page_width = float(page.mediabox.width)
+    page_height = float(page.mediabox.height)
+
     # Create a new PDF with Reportlab
     packet = io.BytesIO()
-    can = canvas.Canvas(packet, pagesize=letter)
-    can.setFont(font_name, 12)
+    can = canvas.Canvas(packet, pagesize=(page_width, page_height))
+    can.setFont(font_name, 16)  # Increased font size
 
     # Add text to the new PDF
-    can.drawString(x1, y1, text1)
-    can.drawString(x2, y2, text2)
+    # Positioning is now relative to page dimensions
+    can.drawString(page_width * 0.5, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
+    can.drawString(page_width * 0.1, page_height * 0.07, text2)  # Left side, about 1/5 up from bottom
     can.save()
 
     # Move to the beginning of the StringIO buffer
     packet.seek(0)
     new_pdf = PdfReader(packet)
 
-    # Read your existing PDF
-    existing_pdf = PdfReader(open(input_pdf, "rb"))
-    output = PdfWriter()
-
-    # If the existing PDF is empty, use the new PDF page
-    if len(existing_pdf.pages) == 0:
-        output.add_page(new_pdf.pages[0])
-    else:
-        # Add the "watermark" (which is the new pdf) on the existing page
-        page = existing_pdf.pages[0]
-        page.merge_page(new_pdf.pages[0])
-        output.add_page(page)
+    # Merge the new PDF with the existing page
+    page.merge_page(new_pdf.pages[0])
+    output.add_page(page)
 
     # Finally, write "output" to a real file
     output_stream = open(output_pdf, "wb")
@@ -53,39 +52,29 @@ def add_text_to_pdf(input_pdf, output_pdf, text1, text2, x1, y1, x2, y2, font_pa
     output_stream.close()
 
 # Usage
-input_pdf = "input.pdf"
-output_pdf = "output.pdf"
-
-# Create input.pdf if it doesn't exist
-if not os.path.exists(input_pdf):
-    print(f"{input_pdf} does not exist. Creating a blank PDF.")
-    create_blank_pdf(input_pdf)
+input_pdf = "ttt.pdf"  # Make sure this matches your input PDF name
+output_pdf = "certificate_filled.pdf"
 
 # Get user input
 text1 = input("Enter the first text in Russian: ")
 text2 = input("Enter the second text in Russian: ")
 
-# You can adjust these coordinates as needed
-x1, y1 = 100, 700  # coordinates for text1
-x2, y2 = 100, 680  # coordinates for text2
-
-
+# Default font path (you may need to adjust this)
 if sys.platform.startswith('win'):
     default_font = 'C:\\Windows\\Fonts\\arial.ttf'
 elif sys.platform.startswith('darwin'):  # macOS
     default_font = '/Library/Fonts/Arial Unicode.ttf'
 else:  # Linux and others
     default_font = '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf'
-# Ask user for font file path
 
+# Ask user for font file path
 font_path = input(f"Enter the path to a TrueType font file (press Enter to use default: {default_font}): ")
 if not font_path:
     font_path = default_font
 
-
 if not os.path.exists(font_path):
-    print(f"Warning: Font file not found at {font_path}. Using default font.")
-    font_path = default_font
+    print(f"Warning: Font file not found at {font_path}. Using Helvetica font.")
+    font_path = None  # This will cause the script to use Helvetica
 
-add_text_to_pdf(input_pdf, output_pdf, text1, text2, x1, y1, x2, y2, font_path)
+add_text_to_pdf(input_pdf, output_pdf, text1, text2, font_path)
 print(f"Modified PDF saved as {output_pdf}")
