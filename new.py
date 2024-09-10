@@ -32,11 +32,67 @@ def add_text_to_pdf(input_pdf, output_pdf, text1, text2, font_path):
     can = canvas.Canvas(packet, pagesize=(page_width, page_height))
     can.setFont(font_name, 16)  # Increased font size
 
+
+    def center_text(text, width):
+        text_width = can.stringWidth(text, font_name, 16)
+        return (width - text_width) / 2
+    
+    print(len(text1))
+    
+    if len(text1) <= 5:
+        x1 = center_text(text1, page_width)
+    elif 5 < len(text1) <= 10:
+        x1 = page_width * 0.46
+    elif 10 < len(text1) <= 15:
+        x1 = page_width * 0.44
+    elif 15 < len(text1) <= 20:
+        x1 = page_width * 0.42
+    elif 21 < len(text1) <= 40:
+        x1 = page_width * 0.35
+    else:
+        x1 = page_width * 0.40
+    
+    can.drawString(x1, page_height * 0.41, text1)
+
+    print(len(text2))
+    if len(text2) <= 5:
+        x2 = page_width * 0.11
+    elif 5 < len(text2) <= 10:
+        x2 = page_width * 0.11
+    elif 10 < len(text2) <= 15:
+        x2 = page_width * 0.09
+    elif 15 < len(text2) <= 20:
+        x2 = page_width * 0.07
+    elif 20 < len(text2) <= 40:
+        x2 = page_width * 0.03
+    else:
+        x2 = page_width * 0.05
+
+    can.drawString(x2, page_height * 0.07, text2)
+    can.save()
+
     # Add text to the new PDF
     # Positioning is now relative to page dimensions
-    can.drawString(page_width * 0.39, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
-    can.drawString(page_width * 0.1, page_height * 0.07, text2)  # Left side, about 1/5 up from bottom
-    can.save()
+    # if len(text1) < 5:
+    #     can.drawString(page_width * 0.48, page_height * 0.41, text1)
+    #     if len(text2) < 5:
+    #         # can.drawString(page_width * 0.48, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
+    #         can.drawString(page_width * 0.13, page_height * 0.07, text2)
+    #     else:
+
+    #         can.drawString(page_width * 0.13, page_height * 0.07, text2)
+
+    #      # Center mein, page ke 55% neeche
+    #     # can.drawString(page_width * 0.13, page_height * 0.07, text2) 
+
+    # if len(text1) > 10 and len(text1)<15:
+    #     if len(text2) 
+    #     can.drawString(page_width * 0.44, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
+    #     can.drawString(page_width * 0.08, page_height * 0.07, text2)  # Left side, about 1/5 up from bottom
+    # if len(text1) > 15:
+    #     can.drawString(page_width * 0.4, page_height * 0.41, text1)  # Center mein, page ke 55% neeche
+    #     can.drawString(page_width * 0.03, page_height * 0.07, text2)  #
+    # can.save()
 
     # Move to the beginning of the StringIO buffer
     packet.seek(0)
